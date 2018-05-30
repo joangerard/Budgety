@@ -7,7 +7,9 @@ var budgetController = (function () {
         totals: {
             exp: 0,
             inc: 0
-        }
+        },
+        budget: 0,
+        percentage: -1
     };
     
     var Expense = function (id, description, value) {
@@ -43,13 +45,50 @@ var budgetController = (function () {
         return newItem;
     };
     
+    var calculateTotal = function (type) {
+        var sum = 0;
+        
+        data.allItems[type].forEach(function (current) {
+            sum = sum + parseFloat(current.value);
+        });
+        
+        data.totals[type] = sum;
+    }
+    
+    var calculateBudget = function () {
+        // calculate total income and expenses        
+        calculateTotal('exp');
+        calculateTotal('inc');
+        
+        // calculate the budget: income - expenses
+        data.budget = data.totals.inc - data.totals.exp;
+        
+        //calculate the percentage of income that we spent
+        if (data.totals.inc > 0){
+            data.percentage = Math.round((data.totals.exp / data.totals.inc) * 100);
+        } else {
+            data.percentage = -1;
+        }
+    }
+    
+    var getBudget = function () {
+        return  {
+            budget: data.budget,
+            percentage: data.percentage,
+            totalInc: data.totals.inc,
+            totalExp: data.totals.exp
+        };
+    }
+    
     var test = function () {
         return data;
     };
     
     return {
         addItem: addItem,
-        test: test
+        test: test,
+        calculateBudget: calculateBudget,
+        getBudget: getBudget
     };
 })();
 
@@ -135,6 +174,19 @@ var controller = (function(budgetCtrl, uiCtrl) {
         });
     };
     
+    var updateBudget = function () {
+        var budget;
+        
+        // 1.- Calculate Budget
+        budgetCtrl.calculateBudget();
+        
+        // 2.- Return the budget
+        budget = budgetCtrl.getBudget();
+        
+        // 3.- Display the budget
+        console.log(budget);
+    }
+    
     var ctrlAddItem = function () {
         var input, newItem;
         
@@ -149,6 +201,9 @@ var controller = (function(budgetCtrl, uiCtrl) {
         
         //4. Clear fields
         uiCtrl.clearFields();
+        
+        // 5. Calculate budget
+        updateBudget();
     };
     
     var init = function () {
