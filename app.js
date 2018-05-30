@@ -74,7 +74,7 @@ var budgetController = (function () {
     var getBudget = function () {
         return  {
             budget: data.budget,
-            percentage: data.percentage,
+            percentage: data.percentage + '%',
             totalInc: data.totals.inc,
             totalExp: data.totals.exp
         };
@@ -100,6 +100,11 @@ var uiController = (function() {
         inputButton: '.add__btn',
         incomeContainer: '.income__list',
         expensesContainer: '.expenses__list',
+        budgetLabel: '.budget__value',
+        incomeLabel: '.budget__income--value',
+        expensesLabel: '.budget__expenses--value',
+        incomePercentage: '.budget__income--percentage',
+        expensesPercentageLabel: '.budget__expenses--percentage'
     };
     
     var getInput = function(){
@@ -150,13 +155,21 @@ var uiController = (function() {
         fieldsArray[0].focus();
     };
     
+    var displayBudget = function (obj) {
+        document.querySelector(DOMStrings.budgetLabel).textContent = obj.budget;
+        document.querySelector(DOMStrings.incomeLabel).textContent = obj.totalInc;
+        document.querySelector(DOMStrings.expensesLabel).textContent = obj.totalExp;
+        document.querySelector(DOMStrings.expensesPercentageLabel).textContent = obj.percentage;
+    }
+    
     return {
         getInput: getInput,
         getDOMStrings: function () {
             return DOMStrings;
         },
         addListItem: addListItem,
-        clearFields: clearFields
+        clearFields: clearFields,
+        displayBudget: displayBudget
     };
 })();
 
@@ -184,7 +197,7 @@ var controller = (function(budgetCtrl, uiCtrl) {
         budget = budgetCtrl.getBudget();
         
         // 3.- Display the budget
-        console.log(budget);
+        uiCtrl.displayBudget(budget);
     }
     
     var ctrlAddItem = function () {
@@ -207,6 +220,12 @@ var controller = (function(budgetCtrl, uiCtrl) {
     };
     
     var init = function () {
+        uiCtrl.displayBudget({
+            budget: 0,
+            percentage: '---',
+            totalInc: 0,
+            totalExp: 0
+        });
         setupEventListeners();
     };
     
