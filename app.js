@@ -92,17 +92,32 @@ var uiController = (function() {
         // Replace the placeholder text with some actual data
         newHtml = html.replace('%id%', obj.id);
         newHtml = newHtml.replace('%description%', obj.description);
-        newHtml = newHtml.replace('%value', obj.value);
+        newHtml = newHtml.replace('%value%', obj.value);
         
         // Insert the HTML into the DOM.
         document.querySelector(element).insertAdjacentHTML('beforeend', newHtml);
-    }
+    };
+    
+    var clearFields = function () {
+        var fields, fieldsArray;
+        fields = document.querySelectorAll(DOMStrings.inputDescription + ', ' + DOMStrings.inputValue);
+        
+        fieldsArray = Array.prototype.slice.call(fields);
+        
+        fieldsArray.forEach(function (field, index, fields) {
+            field.value = '';
+        });
+        
+        fieldsArray[0].focus();
+    };
     
     return {
         getInput: getInput,
         getDOMStrings: function () {
             return DOMStrings;
-        }
+        },
+        addListItem: addListItem,
+        clearFields: clearFields
     };
 })();
 
@@ -128,6 +143,12 @@ var controller = (function(budgetCtrl, uiCtrl) {
         
         // 2. Add new item to budget.
         newItem = budgetCtrl.addItem(input.type, input.description, input.value);
+        
+        // 3. Add new item to the budget list and display it.
+        uiCtrl.addListItem(newItem, input.type);
+        
+        //4. Clear fields
+        uiCtrl.clearFields();
     };
     
     var init = function () {
